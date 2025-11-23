@@ -1,0 +1,45 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+export interface ChatMessage {
+  role: "user" | "model";
+  text: string;
+}
+
+// Helper to get the API Key from storage or env
+const getApiKey = () => {
+  const key = localStorage.getItem('GEMINI_API_KEY') || import.meta.env.VITE_GEMINI_API_KEY;
+  return key ? key.trim() : null;
+};
+
+export async function sendToGemini(
+  history: ChatMessage[],
+  newMessage: string,
+  systemInstruction?: string
+) {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error("API Key missing. Please configure it in settings.");
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  
+  // Usamos el modelo solicitado explícitamente por el usuario
+  const model = genAI.getGenerativeModel({ 
+    model: "gemini-2.5-flash",
+    systemInstruction: systemInstruction 
+  });
+
+  const chat = model.startChat({
+    history: history.map((msg) => ({
+      role: msg.role,
+      parts: [{ text: msg.text }],
+    })),
+    generationConfig: {
+      maxOutputTokens: 8192,
+    },
+  });
+
+  const result = await chat.sendMessage(newMessage);
+  const response = result.response;
+  return response.text();
+}
