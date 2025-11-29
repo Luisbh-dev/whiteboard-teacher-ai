@@ -5,9 +5,9 @@ export interface ChatMessage {
   text: string;
 }
 
-// Helper to get the API Key from storage or env
+// Helper to get the API Key from env
 const getApiKey = () => {
-  const key = localStorage.getItem('GEMINI_API_KEY') || import.meta.env.VITE_GEMINI_API_KEY;
+  const key = import.meta.env.VITE_GEMINI_API_KEY;
   return key ? key.trim() : null;
 };
 
@@ -18,7 +18,7 @@ export async function sendToGemini(
 ) {
   const apiKey = getApiKey();
   if (!apiKey) {
-    throw new Error("API Key missing. Please configure it in settings.");
+    throw new Error("API Key missing. Please check VITE_GEMINI_API_KEY in .env file.");
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);

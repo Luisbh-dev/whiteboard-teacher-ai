@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Whiteboard, { Stroke, GraphWidget } from './components/Whiteboard';
 import Chat, { Message } from './components/Chat';
 import { sendToGemini } from './lib/gemini';
-import { Menu, X, Key } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 function App() {
   const [strokes, setStrokes] = useState<Stroke[]>([]);
@@ -10,20 +10,6 @@ function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(true);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('GEMINI_API_KEY') || import.meta.env.VITE_GEMINI_API_KEY || '');
-  const [showApiKeyModal, setShowApiKeyModal] = useState(!apiKey);
-
-  // Save API key to localStorage if user enters it
-  const handleApiKeySave = (key: string) => {
-    localStorage.setItem('GEMINI_API_KEY', key);
-    setApiKey(key);
-    setShowApiKeyModal(false);
-    // Reload to pick up the new env var logic effectively? 
-    // Actually we need to pass it to gemini.ts or update how gemini.ts works.
-    // Since gemini.ts reads from import.meta.env at top level, we might need to refactor it to accept a key.
-    // For now, I'll just force a reload if they enter it, or better, update gemini.ts to export a setup function.
-    window.location.reload(); 
-  };
 
   const findFreePosition = (width: number, height: number) => {
     const GAP = 20;
@@ -68,6 +54,10 @@ function App() {
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
 
+    // Detectar idioma
+    const userLanguage = navigator.language || 'es-ES';
+    const isSpanish = userLanguage.startsWith('es');
+
     try {
       const systemPrompt = `
         Eres un asistente matemático y físico experto que utiliza una pizarra digital.
@@ -106,7 +96,7 @@ function App() {
         IMPORTANTE:
         - Usa nombres de claves en 'data' que sirvan de leyenda (ej: "Posición", "Energía").
         - SIEMPRE incluye las unidades en xAxisLabel y yAxisLabel.
-        - Responde en español.
+        - Responde en ${isSpanish ? 'español' : 'inglés'}.
       `;
 
       // We need to pass the history properly
@@ -171,19 +161,18 @@ function App() {
 
       // Fallback if text is empty but widget exists
       if (!cleanText && widgetCreated) {
-        cleanText = "He generado una gráfica con los resultados en la pizarra.";
+        cleanText = isSpanish ? "He generado una gráfica con los resultados en la pizarra." : "I've generated a graph with the results on the whiteboard.";
       } else if (!cleanText) {
-        cleanText = "Aquí tienes la respuesta (revisa la pizarra).";
+        cleanText = isSpanish ? "Aquí tienes la respuesta (revisa la pizarra)." : "Here is the answer (check the whiteboard).";
       }
 
       setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'model', text: cleanText }]);
     } catch (error: any) {
-      let errorMessage = "Lo siento, hubo un error al conectar con Gemini.";
+      let errorMessage = isSpanish ? "Lo siento, hubo un error al conectar con Gemini." : "Sorry, there was an error connecting to Gemini.";
       
       if (error.message) {
         if (error.message.includes('API key')) {
-          errorMessage += " La API Key parece ser inválida.";
-          setShowApiKeyModal(true); // Reopen modal if key is invalid
+          errorMessage += isSpanish ? " La API Key parece ser inválida o falta." : " The API Key seems to be invalid or missing.";
         } else {
           errorMessage += ` Detalle: ${error.message}`;
         }
@@ -203,45 +192,6 @@ function App() {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-100">
-      {/* API Key Modal */}
-      {showApiKeyModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-xl w-96">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Key className="w-5 h-5" /> Configurar API Key
-            </h2>
-            <p className="text-sm text-gray-600 mb-4">
-              Para usar Gemini Flash, necesitas una API Key de Google AI Studio.
-            </p>
-            <input
-              type="password"
-              placeholder="Pegar API Key aquí..."
-              className="w-full p-2 border rounded mb-4"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleApiKeySave((e.target as HTMLInputElement).value);
-              }}
-            />
-            <div className="flex justify-end gap-2">
-              <button 
-                onClick={() => setShowApiKeyModal(false)}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
-              >
-                Cancelar
-              </button>
-              <button 
-                onClick={(e) => {
-                  const input = e.currentTarget.parentElement?.previousElementSibling as HTMLInputElement;
-                  handleApiKeySave(input.value);
-                }}
-                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-              >
-                Guardar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Main Content */}
       <div className="relative flex-1 h-full">
         <Whiteboard 
@@ -260,15 +210,6 @@ function App() {
             <Menu className="w-6 h-6" />
           </button>
         )}
-        
-        {/* Settings Button */}
-        <button
-            onClick={() => setShowApiKeyModal(true)}
-            className="absolute bottom-4 left-4 p-2 bg-white/80 backdrop-blur text-gray-600 rounded-full shadow hover:bg-white transition-colors z-30"
-            title="Configurar API Key"
-          >
-            <Key className="w-5 h-5" />
-        </button>
       </div>
 
       {/* Chat Sidebar */}
@@ -278,12 +219,14 @@ function App() {
         }`}
       >
         <div className="h-full relative">
-          <button
-            onClick={() => setIsChatOpen(false)}
-            className="absolute top-2 -left-10 p-2 bg-white text-gray-600 rounded-l-lg shadow-md hover:bg-gray-50"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          {isChatOpen && (
+            <button
+              onClick={() => setIsChatOpen(false)}
+              className="absolute top-2 -left-10 p-2 bg-white text-gray-600 rounded-l-lg shadow-md hover:bg-gray-50"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
           <Chat 
             messages={messages} 
             onSendMessage={handleSendMessage} 

@@ -2,6 +2,17 @@
 
 **Whiteboard Teacher AI** is an interactive educational platform designed to transform the teaching and learning of mathematics and physics. It combines the flexibility of an infinite digital whiteboard with the power of an advanced AI assistant (Google Gemini).
 
+This system is deployed and available at: **[https://whiteboard.glot.school/](https://whiteboard.glot.school/)**
+
+## 🌍 Glot Poly Use Case
+
+**Glot Poly** utilizes this whiteboard system to provide a seamless, AI-powered tutoring experience. The goal is to create an environment where students can:
+*   **Visualize** complex mathematical and physical concepts instantly.
+*   **Interact** with an AI tutor that understands context and provides step-by-step guidance.
+*   **Bridge the gap** between abstract theory and concrete understanding through dynamic graphing and infinite canvas capabilities.
+
+This integration ensures that students using Glot Poly have access to cutting-edge educational tools without needing to manage technical configurations like API keys.
+
 ## 🚀 Mission: Supporting Education
 
 Our main goal is to **democratize access to personalized tutoring** and **improve the understanding of complex concepts** through visualization. We believe education should be:
@@ -57,8 +68,16 @@ This project is built with a modern and robust stack:
     ```
 
 3.  **Configure API Key**
-    *   You need an API Key from [Google AI Studio](https://aistudio.google.com/).
-    *   You can configure it by creating an `.env` file (see `.env.example` if it exists) or by entering it directly in the application interface (stored in `localStorage`).
+    *   **Crucial Step:** You need an API Key from [Google AI Studio](https://aistudio.google.com/).
+    *   Create a `.env` file in the root directory based on `.env.example`:
+        ```bash
+        cp .env.example .env
+        ```
+    *   Add your Google Gemini API Key to the `.env` file:
+        ```
+        VITE_GEMINI_API_KEY=your_api_key_here
+        ```
+    *   *Note: The end-user does not need to provide a key if the environment variable is correctly set up during deployment.*
 
 4.  **Run in development**
     ```bash
