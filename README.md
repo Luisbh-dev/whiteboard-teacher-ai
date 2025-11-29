@@ -1,5 +1,12 @@
 # 🎓 Whiteboard Teacher AI
 
+![Status Beta](https://img.shields.io/badge/Status-Beta-orange?style=for-the-badge&logo=fire)
+![Gemini AI](https://img.shields.io/badge/AI-Powered_by_Gemini-blue?style=for-the-badge&logo=google-gemini&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+
 **Whiteboard Teacher AI** is an interactive educational platform designed to transform the teaching and learning of mathematics and physics. It combines the flexibility of an infinite digital whiteboard with the power of an advanced AI assistant (Google Gemini).
 
 This system is deployed and available at: **[https://whiteboard.glot.school/](https://whiteboard.glot.school/)**
