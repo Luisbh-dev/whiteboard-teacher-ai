@@ -22,7 +22,7 @@ export interface GraphWidget {
   title: string;
   xAxisLabel?: string;
   yAxisLabel?: string;
-  data: any[];
+  data: Record<string, unknown>[];
   position: { x: number; y: number };
   width: number;
   height: number;
