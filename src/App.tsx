@@ -148,15 +148,6 @@ function App() {
           console.error("Error parsing JSON from Gemini", e);
           // Don't remove text if we failed to parse the widget, so user can at least see the raw data
         }
-      } else {
-        // Fallback: Look for raw JSON object at the end of the string if no code blocks used
-        const lastBraceIndex = rawResponse.lastIndexOf('}');
-        const firstBraceIndex = rawResponse.indexOf('{');
-        
-        if (lastBraceIndex > firstBraceIndex && firstBraceIndex !== -1) {
-           // This is risky but might catch cases where model forgets code blocks
-           // Implementation skipped for safety to avoid parsing normal text as JSON
-        }
       }
 
       // Fallback if text is empty but widget exists
