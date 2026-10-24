@@ -6,7 +6,7 @@ export interface ChatMessage {
 }
 
 // Helper to get the API Key from env
-const getApiKey = () => {
+export const getApiKey = () => {
   const key = import.meta.env.VITE_GEMINI_API_KEY;
   return key ? key.trim() : null;
 };
