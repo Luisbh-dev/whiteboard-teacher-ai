@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { Trash2, Move, X, Download, Eraser, Pen, Minus, Plus } from 'lucide-react';
 import clsx from 'clsx';
@@ -50,6 +50,14 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ strokes, setStrokes, widgets, s
   // Widget Dragging State
   const [draggingWidgetId, setDraggingWidgetId] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+
+  const widgetKeysMap = useMemo(() => {
+    const map = new Map<string, string[]>();
+    widgets.forEach(w => {
+      map.set(w.id, Object.keys(w.data[0] || {}).filter(k => k !== 'name'));
+    });
+    return map;
+  }, [widgets]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -316,7 +324,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ strokes, setStrokes, widgets, s
                       contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                     />
                     <Legend verticalAlign="top" height={36}/>
-                    {Object.keys(widget.data[0] || {}).filter(k => k !== 'name').map((key, idx) => (
+                    {(widgetKeysMap.get(widget.id) || []).map((key, idx) => (
                       <Line 
                         key={key} 
                         type="monotone" 
@@ -347,7 +355,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ strokes, setStrokes, widgets, s
                       contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                     />
                     <Legend verticalAlign="top" height={36}/>
-                    {Object.keys(widget.data[0] || {}).filter(k => k !== 'name').map((key, idx) => (
+                    {(widgetKeysMap.get(widget.id) || []).map((key, idx) => (
                       <Bar 
                         key={key} 
                         dataKey={key} 
