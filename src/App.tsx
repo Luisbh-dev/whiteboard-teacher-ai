@@ -15,6 +15,7 @@ function App() {
     const GAP = 20;
     const START_X = 50;
     const START_Y = 50;
+    const CHAT_SIDEBAR_WIDTH = 350;
     
     // Try to find a spot in a grid layout
     // We scan rows and columns
@@ -25,7 +26,7 @@ function App() {
         
         // Check if out of bounds (right side)
         // We allow vertical scroll, so we don't check bottom bound strictly, but we check right bound
-        if (col > 0 && x + width > window.innerWidth - 350) { // -350 to account for chat sidebar
+        if (col > 0 && x + width > window.innerWidth - CHAT_SIDEBAR_WIDTH) { // Account for chat sidebar
           break; // Go to next row
         }
         
