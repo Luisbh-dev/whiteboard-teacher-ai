@@ -76,7 +76,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ strokes, setStrokes, widgets, s
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     redraw(ctx);
-  }, [strokes, currentStroke]);
+  }, [strokes]);
 
   const redraw = (ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -142,6 +142,35 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ strokes, setStrokes, widgets, s
     if (!isDrawing || !currentStroke) return;
     e.preventDefault(); // Prevent scrolling on touch
     const point = getPoint(e);
+
+    // Incrementally draw the new segment
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx && currentStroke.points.length > 0) {
+        const lastPoint = currentStroke.points[currentStroke.points.length - 1];
+
+        ctx.beginPath();
+        ctx.lineWidth = currentStroke.width;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        if (currentStroke.isEraser) {
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.strokeStyle = 'rgba(0,0,0,1)';
+        } else {
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.strokeStyle = currentStroke.color;
+        }
+
+        ctx.moveTo(lastPoint.x, lastPoint.y);
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
+
+        ctx.globalCompositeOperation = 'source-over';
+      }
+    }
+
     setCurrentStroke(prev => prev ? {
       ...prev,
       points: [...prev.points, point]
