@@ -167,10 +167,10 @@ function App() {
       }
 
       setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'model', text: cleanText }]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       let errorMessage = isSpanish ? "Lo siento, hubo un error al conectar con Gemini." : "Sorry, there was an error connecting to Gemini.";
       
-      if (error.message) {
+      if (error instanceof Error && error.message) {
         if (error.message.includes('API key')) {
           errorMessage += isSpanish ? " La API Key parece ser inválida o falta." : " The API Key seems to be invalid or missing.";
         } else {
