@@ -1,5 +1,4 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import Chat, { Message } from '../Chat';
@@ -49,8 +48,6 @@ describe('Chat Component', () => {
     render(<Chat {...defaultProps} />);
 
     const input = screen.getByPlaceholderText('Escribe un problema matemático...');
-    const submitButton = screen.getByRole('button', { name: '' }); // The button with Send icon, not clear board which has title "Limpiar Pizarra"
-    // Let's rely on finding it by type="submit" or icon
 
     await userEvent.type(input, 'What is the speed of light?');
     expect(input).toHaveValue('What is the speed of light?');
